@@ -1,23 +1,33 @@
-FROM ubuntu:16.04
+FROM lsiobase/ubuntu:bionic
+LABEL maintainer="Mike Weaver @_bashNinja"
 
-ARG PRITUNL_VERSION="1.29.1999.88"
-ENV PRITUNL_VERSION=${PRITUNL_VERSION}
+# set version label
+ARG BUILD_DATE
+ARG VERSION
+LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 
-ARG MONGODB_VERSION="3.2"
-ENV MONGODB_VERSION=${MONGODB_VERSION}
+ENV DEBIAN_FRONTEND noninteractive
 
-LABEL MAINTAINER="Dmitry Malinin <dmitry@malinin.com>"
+RUN apt-get update -yq && \
+    apt-get install -yq software-properties-common apt-utils iptables && \
+    echo "deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-4.0.list && \
+    echo "deb http://repo.pritunl.com/stable/apt bionic main" > /etc/apt/sources.list.d/pritunl.list && \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv 7568D9BB55FF9E5287D586017AE645C0CF8E292A && \
+    apt-get --assume-yes update && \
+    apt-get --assume-yes upgrade && \
+    apt-get --assume-yes install pritunl mongodb-server && \
+    # Cleanup
+    apt-get clean -y && \
+    apt-get autoremove -y && \
+    rm -rfv /tmp/* /var/lib/apt/lists/* /var/tmp/* 
 
-COPY --chown=root:root ["docker-install.sh", "/root"]
-RUN bash /root/docker-install.sh
+RUN \
+    echo "* hard nofile 64000" >> /etc/security/limits.conf \
+    echo "* soft nofile 64000" >> /etc/security/limits.conf \
+    echo "root hard nofile 64000" >> /etc/security/limits.conf \
+    echo "root soft nofile 64000" >> /etc/security/limits.conf
 
-ADD start-pritunl /bin/start-pritunl
-
-EXPOSE 80
-EXPOSE 443
-EXPOSE 1194
-EXPOSE 1194/udp
-
-ENTRYPOINT ["/bin/start-pritunl"]
-
-CMD ["/usr/bin/tail", "-f","/var/log/pritunl.log"]
+COPY root/ /
+EXPOSE 1194 443 80
+VOLUME /config

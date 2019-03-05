@@ -4,7 +4,7 @@ LABEL maintainer="Mike Weaver @_bashNinja"
 # set version label
 ARG BUILD_DATE
 ARG VERSION
-LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL build_version="version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 
 ENV DEBIAN_FRONTEND noninteractive
 

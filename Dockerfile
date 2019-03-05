@@ -1,10 +1,10 @@
 FROM lsiobase/ubuntu:bionic
-LABEL maintainer="Mike Weaver @_bashNinja"
+LABEL maintainer="Dmitry Malinin <dmitry@malinin.com>"
 
 # set version label
-ARG BUILD_DATE
-ARG VERSION
-LABEL build_version="version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+#ARG BUILD_DATE
+#ARG VERSION
+#LABEL build_version="version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 
 ENV DEBIAN_FRONTEND noninteractive
 
